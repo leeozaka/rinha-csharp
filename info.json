@@ -1,10 +1,8 @@
 {
     "name": "Leonardo Neves",
-    "social": ["https://github.com/leeozaka", "https://linkedin.com/in/leeonardoneves"],
+    "social": ["https://linkedin.com/in/leeonardoneves"],
     "source-code-repo": "https://github.com/leeozaka/rinha-csharp",
     "langs": ["csharp"],
     "storages": ["redis"],
-    "messaging": [],
-    "load-balancers": ["nginx"],
-    "other-technologies": ["dotnet", "docker", "minimal-apis"]
+    "load-balancers": ["nginx"]
 } 
