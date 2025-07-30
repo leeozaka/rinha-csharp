@@ -18,9 +18,7 @@ services:
           memory: "20MB"
 
   rinha-csharp-1: &rinha-csharp-service
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: leeozaka/rinha-csharp:latest
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5000
