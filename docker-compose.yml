@@ -1,0 +1,66 @@
+services:
+  nginx:
+    image: nginx:1.29.0-alpine
+    ports:
+      - "9999:9999"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - rinha-csharp-1
+      - rinha-csharp-2
+    networks:
+      - backend-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: "20MB"
+
+  rinha-csharp-1: &rinha-csharp-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__Redis=redis:6379
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - backend-network
+      - payment-processor
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.6"
+          memory: "50MB"
+
+  rinha-csharp-2:
+    <<: *rinha-csharp-service
+
+  redis:
+    image: redis:8.0.3-alpine
+    command: redis-server --save "" --appendonly no --protected-mode no --tcp-keepalive 60 --tcp-backlog 511 --maxmemory 20mb --maxmemory-policy allkeys-lru
+    networks:
+      - backend-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: "0.05"
+          memory: "20MB"
+
+networks:
+  backend-network:
+    driver: bridge
+  payment-processor:
+    external: true
