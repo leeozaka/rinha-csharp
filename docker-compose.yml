@@ -18,7 +18,10 @@ services:
           memory: "20MB"
 
   rinha-csharp-1: &rinha-csharp-service
-    image: leeozaka/rinha-csharp:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # image: leeozaka/rinha-csharp:amd64
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5000
@@ -33,8 +36,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.6"
-          memory: "50MB"
+          cpus: "0.55"
+          memory: "100MB"
 
   rinha-csharp-2:
     <<: *rinha-csharp-service
@@ -54,7 +57,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.05"
+          cpus: "0.15"
           memory: "20MB"
 
 networks:

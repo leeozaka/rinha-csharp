@@ -6,4 +6,5 @@ public interface IPaymentProcessorHealthService
 {
     Task<ProcessorHealthInfo> GetHealthInfoAsync(ProcessorType processorType);
     ProcessorType GetBestProcessor();
+    void UpdateHealthAsync(ProcessorType processorType);
 }

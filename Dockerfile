@@ -8,7 +8,8 @@ COPY . .
 RUN dotnet restore
 RUN dotnet publish Rinha-Csharp/Rinha-Csharp.csproj -c Release -o /app
 
-FROM mcr.microsoft.com/dotnet/runtime-deps:9.0-alpine AS runtime
+#FROM mcr.microsoft.com/dotnet/runtime-deps:9.0-alpine AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS runtime
 
 WORKDIR /app
 COPY --from=build /app .

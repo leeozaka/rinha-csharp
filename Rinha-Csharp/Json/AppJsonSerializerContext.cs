@@ -10,8 +10,11 @@ namespace Rinha_Csharp.Json;
 [JsonSerializable(typeof(ProcessedPayment))]
 [JsonSerializable(typeof(PaymentSummaryResponse))]
 [JsonSerializable(typeof(ProcessorSummary))]
+[JsonSerializable(typeof(PaymentStorageData))]
+[JsonSerializable(typeof(PaymentSummaryData))]
 [JsonSerializable(typeof(HealthStatus))]
 [JsonSerializable(typeof(ProcessorHealthResponse))]
+[JsonSerializable(typeof(ProcessorHealthInfo))]
 [JsonSerializable(typeof(ProblemDetails))]
 [JsonSourceGenerationOptions(
     PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,

@@ -5,5 +5,5 @@ namespace Rinha_Csharp.Abstractions;
 public interface IPaymentProcessorService
 {
     Task<bool> ProcessPaymentAsync(PaymentRequest payment);
-    Task<PaymentSummaryResponse> GetPaymentsSummaryAsync(DateTime? from = null, DateTime? to = null);
+    Task<PaymentSummaryResponse> GetPaymentsSummaryAsync(DateTimeOffset? from = null, DateTimeOffset? to = null);
 } 

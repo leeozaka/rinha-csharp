@@ -8,6 +8,10 @@ using Rinha_Csharp.Configuration;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
+// builder.Logging.ClearProviders();
+// builder.Logging.AddConsole();
+// builder.Logging.SetMinimumLevel(LogLevel.Information);
+
 var appConfig = new AppConfiguration();
 builder.Configuration.Bind(appConfig);
 
@@ -91,7 +95,8 @@ builder.Services.AddHttpClient<PaymentProcessorHealthService>((sp, client) =>
 
 builder.Services.AddSingleton<IPaymentProcessorHealthService, PaymentProcessorHealthService>();
 builder.Services.AddSingleton<IPaymentProcessorService, PaymentProcessorService>();
-builder.Services.AddHostedService<QueueProcessorService>();
+builder.Services.AddHostedService<QueueProcessor>();
+builder.Services.AddHostedService<HealthMonitoringService>();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
@@ -105,40 +110,24 @@ var app = builder.Build();
 
 app.MapPost("/payments", async (PaymentRequestDto request, IInMemoryPaymentQueue paymentQueue) =>
 {
-    try
-    {
         var payment = new PaymentRequest(
             request.CorrelationId,
             request.Amount,
-            DateTime.UtcNow
+            DateTimeOffset.UtcNow
         );
         
-        var accepted = await paymentQueue.EnqueueAsync(payment).ConfigureAwait(false);
-        
-        if (!accepted)
+        if (await paymentQueue.EnqueueAsync(payment).ConfigureAwait(false))
         {
-            return Results.Problem("Payment rejected by queue", statusCode: 503);
+            return Results.Accepted();
         }
         
-        return Results.Accepted();
-    }
-    catch (Exception)
-    {
-        return Results.InternalServerError();
-    }
+        return Results.Problem("Payment rejected", statusCode: 503);
 });
 
-app.MapGet("/payments-summary", async (IPaymentProcessorService paymentProcessorService, DateTime? from, DateTime? to) =>
+app.MapGet("/payments-summary", async (IPaymentProcessorService paymentProcessorService, DateTimeOffset? from, DateTimeOffset? to) =>
 {
-    try
-    {
-        var summary = await paymentProcessorService.GetPaymentsSummaryAsync(from, to).ConfigureAwait(false);
-        return Results.Ok(summary);
-    }
-    catch (Exception)
-    {
-        return Results.InternalServerError();
-    }
+    var summary = await paymentProcessorService.GetPaymentsSummaryAsync(from, to).ConfigureAwait(false);
+    return Results.Ok(summary);
 });
 
 app.MapGet("/health", () => 
